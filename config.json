@@ -15,25 +15,7 @@
       "model_name": "nemotron-120b",
       "model_fallbacks": [
         "meta-llama-llama-3.3-70b-instruct:free",
-        "qwen-qwen3-coder:free",
-        "openrouter-elephant-alpha",
-        "google-gemma-4-26b-a4b-it:free",
-        "google-gemma-4-31b-it:free",
-        "nvidia-nemotron-3-super-120b-a12b:free",
-        "qwen-qwen3-next-80b-a3b-instruct:free",
-        "nvidia-nemotron-nano-9b-v2:free",
-        "inclusionai-ling-2.6-1t:free",
-        "minimax-minimax-m2.5:free",
-        "openrouter-free",
-        "nvidia-nemotron-3-nano-omni-30b-a3b-reasoning:free",
-        "nvidia-nemotron-3-nano-30b-a3b:free",
-        "nvidia-nemotron-nano-12b-v2-vl:free",
-        "openai-gpt-oss-120b:free",
-        "openai-gpt-oss-20b:free",
-        "poolside-laguna-xs.2:free",
-        "poolside-laguna-m.1:free",
-        "tencent-hy3-preview:free",
-        "z-ai-glm-4.5-air:free"
+        "qwen-qwen3-coder:free"
       ],
       "max_tokens": 32768,
       "max_tool_iterations": 50,
@@ -395,13 +377,6 @@
       "request_timeout": 45
     },
     {
-      "model_name": "openrouter-elephant",
-      "model": "openrouter/elephant-alpha",
-      "protocol": "openrouter",
-      "api_base": "https://openrouter.ai/api/v1",
-      "request_timeout": 45
-    },
-    {
       "model_name": "openrouter-free",
       "model": "arcee-ai/trinity-large-preview:free",
       "protocol": "openrouter",
@@ -623,13 +598,6 @@
       "enabled": true
     },
     {
-      "model_name": "openrouter-elephant-alpha",
-      "model": "openrouter/elephant-alpha",
-      "protocol": "openrouter",
-      "request_timeout": 45,
-      "enabled": true
-    },
-    {
       "model_name": "minimax-minimax-m2.5:free",
       "model": "minimax/minimax-m2.5:free",
       "protocol": "openrouter",
@@ -669,54 +637,6 @@
       "model": "openai/gpt-oss-20b:free",
       "protocol": "openrouter",
       "request_timeout": 45,
-      "enabled": true
-    },
-    {
-      "model_name": "google-gemma-4-26b-a4b-it:free",
-      "model": "google/gemma-4-26b-a4b-it:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "google-gemma-4-31b-it:free",
-      "model": "google/gemma-4-31b-it:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "inclusionai-ling-2.6-1t:free",
-      "model": "inclusionai/ling-2.6-1t:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "nvidia-nemotron-3-nano-omni-30b-a3b-reasoning:free",
-      "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "poolside-laguna-xs.2:free",
-      "model": "poolside/laguna-xs.2:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "poolside-laguna-m.1:free",
-      "model": "poolside/laguna-m.1:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "tencent-hy3-preview:free",
-      "model": "tencent/hy3-preview:free",
-      "protocol": "openrouter",
-      "enabled": true
-    },
-    {
-      "model_name": "z-ai-glm-4.5-air:free",
-      "model": "z-ai/glm-4.5-air:free",
-      "protocol": "openrouter",
       "enabled": true
     }
   ],
@@ -781,8 +701,14 @@
     }
   },
   "tools": {
-    "allow_read_paths": null,
-    "allow_write_paths": null,
+    "allow_read_paths": [
+      "/home/picoclaw/.picoclaw",
+      "/tmp"
+    ],
+    "allow_write_paths": [
+      "/home/picoclaw/.picoclaw",
+      "/tmp"
+    ],
     "filter_sensitive_data": true,
     "filter_min_length": 8,
     "web": {
@@ -840,8 +766,8 @@
       "allow_remote": true,
       "custom_deny_patterns": null,
       "custom_allow_patterns": [
-        "^git\\s+push\\b",
-        "^git\\s+force\\b"
+        "\\bgit\\s+push\\b",
+        "\\bgit\\s+force\\b"
       ],
       "timeout_seconds": 60
     },
