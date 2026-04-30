@@ -1,0 +1,22 @@
+# Ignore runtime and temporary files
+.picoclaw.pid
+*.log
+logs/
+sessions/
+state/
+.secrets/
+.secret*
+.env
+.artifacts/
+*.bak
+# Ignore large binary files
+*.swp
+*~
+# Ignore config files that may contain secrets
+.config.json
+.security.yml
+# Ignore test repos
+test_git_repo/
+test_monitor_repo/
+# Ignore workspace if it's large
+workspace/
