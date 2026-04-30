@@ -20,3 +20,4 @@ test_git_repo/
 test_monitor_repo/
 # Ignore workspace if it's large
 workspace/
+secrets/
