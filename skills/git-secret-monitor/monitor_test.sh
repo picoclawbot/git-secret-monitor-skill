@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Git Secret Monitor - Main Script
-# This script gathers git repository info and changed file contents,
+# Git Secret Monitor - Test Script
+# This script gathers git repository info and changed file contents from test_monitor_repo,
 # then outputs them for the PicoClaw agent to scan using the MCP secret scanner.
 #
-# Usage: bash monitor.sh
+# Usage: bash monitor_test.sh
 # Output: Structured data on stdout for the agent to process
 
 MONITOR_DIR="${MONITOR_DIR:-/home/picoclaw/.picoclaw}"
@@ -14,15 +14,15 @@ log_message() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
 }
 
-# Run gather_info.sh to find repos and changed files
-GATHER_SCRIPT="/home/picoclaw/.picoclaw/skills/git-secret-monitor/gather_info.sh"
+# Run gather_info.sh to find repos and changed files (test version)
+GATHER_SCRIPT="/home/picoclaw/.picoclaw/skills/git-secret-monitor/gather_info_test.sh"
 
 if [[ ! -x "$GATHER_SCRIPT" ]]; then
-    log_message "ERROR: gather_info.sh not found or not executable"
+    log_message "ERROR: gather_info_test.sh not found or not executable"
     exit 1
 fi
 
-log_message "Starting Git secret monitor"
+log_message "Starting Git secret monitor (TEST)"
 
 temp_file=$(mktemp)
 "$GATHER_SCRIPT" > "$temp_file" 2>/dev/null
@@ -78,5 +78,5 @@ done < "$temp_file"
 
 rm -f "$temp_file"
 
-log_message "Git secret monitor completed — ${file_count} file(s) to scan"
+log_message "Git secret monitor completed (TEST) — ${file_count} file(s) to scan"
 echo "TOTAL_FILES:${file_count}"
