@@ -13,6 +13,7 @@ MAX_COMMIT_AGE_DAYS="${MAX_COMMIT_AGE_DAYS:-7}"
 # Add or remove repos from this list as needed.
 # Each path must contain a .git directory.
 REPOS_TO_MONITOR=(
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/freeride"
     "/home/picoclaw/.picoclaw/repos/picoclaw"
     "/home/picoclaw/.picoclaw/repos/stevef1uk/picoclaw"
     "/home/picoclaw/.picoclaw/repos/stevef1uk/artificial_mind"
