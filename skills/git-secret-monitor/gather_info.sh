@@ -7,58 +7,86 @@
 
 # Configuration
 MONITOR_DIR="${MONITOR_DIR:-/home/picoclaw/.picoclaw}"
+MAX_COMMIT_AGE_DAYS="${MAX_COMMIT_AGE_DAYS:-7}"
 
-# Output format: JSON-like for easy parsing
-# We'll output repo info and file lists that the agent can process
+# Repositories to monitor
+# Add or remove repos from this list as needed.
+# Each path must contain a .git directory.
+REPOS_TO_MONITOR=(
+    "/home/picoclaw/.picoclaw/repos/picoclaw"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/picoclaw"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/artificial_mind"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/agentdojo-picoclaw-security"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/agents"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/argo"
+    "/home/picoclaw/.picoclaw/repos/stevef1uk/app-test-1"
+    "/home/picoclaw/.picoclaw/repos/agents"
+)
 
 echo "GIT_SECRET_MONITOR_START"
+echo "MAX_COMMIT_AGE_DAYS:${MAX_COMMIT_AGE_DAYS}"
 
-# Find all Git repositories in the monitor directory
-while IFS= read -r -d '' git_dir; do
-    repo_dir="$(dirname "$git_dir")"
-    
-    # Change to repository directory
-    if cd "$repo_dir"; then
-        # Get the current branch
-        current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-        if [[ $? -ne 0 ]]; then
-            continue
-        fi
-        
-        # Get the latest commit hash
-        latest_commit=$(git rev-parse HEAD 2>/dev/null)
-        if [[ $? -ne 0 ]]; then
-            continue
-        fi
-        
-        # Get files changed in the latest commit
-        changed_files=$(git diff-tree --no-commit-id --name-only -r "$latest_commit" 2>/dev/null)
-        
-        if [[ -z "$changed_files" ]]; then
+max_age_seconds=$((MAX_COMMIT_AGE_DAYS * 86400))
+now=$(date +%s)
+
+for repo_dir in "${REPOS_TO_MONITOR[@]}"; do
+    if [[ ! -d "$repo_dir" || ! -d "$repo_dir/.git" ]]; then
+        echo "SKIP:$repo_dir (not found or not a git repo)"
+        continue
+    fi
+
+    if ! cd "$repo_dir"; then
+        echo "SKIP:$repo_dir (cannot cd)"
+        continue
+    fi
+
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        cd - > /dev/null
+        continue
+    fi
+
+    latest_commit=$(git rev-parse HEAD 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        cd - > /dev/null
+        continue
+    fi
+
+    # --- Option 1: skip repos whose latest commit is older than threshold ---
+    commit_epoch=$(git log -1 --format="%ct" HEAD 2>/dev/null)
+    if [[ -n "$commit_epoch" ]]; then
+        age_seconds=$((now - commit_epoch))
+        if [[ $age_seconds -gt $max_age_seconds ]]; then
+            age_days=$((age_seconds / 86400))
+            echo "SKIP:$repo_dir (last commit ${age_days}d ago, older than ${MAX_COMMIT_AGE_DAYS}d)"
             cd - > /dev/null
             continue
         fi
-        
-        # Output repository information
-        echo "REPO_START"
-        echo "REPO_DIR:$repo_dir"
-        echo "BRANCH:$current_branch"
-        echo "COMMIT:$latest_commit"
-        
-        # Output each changed file
-        echo "FILES_START"
-        while IFS= read -r file; do
-            if [[ -n "$file" && -f "$file" ]]; then
-                echo "FILE:$file"
-            fi
-        done <<< "$changed_files"
-        echo "FILES_END"
-        
-        echo "REPO_END"
-        
-        # Return to original directory
-        cd - > /dev/null
     fi
-done < <(find "$MONITOR_DIR" -type d -name ".git" -print0 2>/dev/null)
+
+    changed_files=$(git diff-tree --no-commit-id --name-only -r "$latest_commit" 2>/dev/null)
+
+    if [[ -z "$changed_files" ]]; then
+        cd - > /dev/null
+        continue
+    fi
+
+    echo "REPO_START"
+    echo "REPO_DIR:$repo_dir"
+    echo "BRANCH:$current_branch"
+    echo "COMMIT:$latest_commit"
+
+    echo "FILES_START"
+    while IFS= read -r file; do
+        if [[ -n "$file" && -f "$file" ]]; then
+            echo "FILE:$file"
+        fi
+    done <<< "$changed_files"
+    echo "FILES_END"
+
+    echo "REPO_END"
+
+    cd - > /dev/null
+done
 
 echo "GIT_SECRET_MONITOR_END"
