@@ -45,13 +45,18 @@ scan_file_for_secrets() {
     local temp_scan_file=$(mktemp)
     echo "$content" > "$temp_scan_file"
     
-    # Call the secret scanner via the MCP tool using the agent's exec tool
-    # We'll use the PicoClaw agent's ability to call MCP tools through a workaround
-    # Since we can't directly call MCP tools from bash, we'll note that scanning would happen
-    # In a real implementation, this would be handled by the agent's MCP integration
+    # Call the secret scanner via the MCP tool
+    # We use the PicoClaw agent's exec tool to call the MCP secret scanner
+    # This assumes the agent can intercept and handle MCP tool calls
+    local scan_result
+    scan_result=$(mcp_hdn-server_secret_scanner --path "$temp_scan_file" 2>&1 || true)
     
-    # For now, we'll simulate the scan by checking if we can call the scanner through available means
-    # Actually, let's try to call it directly - the agent should be able to handle this
+    # Check if any secrets were found
+    if [[ "$scan_result" != *"No secrets found"* && -n "$scan_result" && "$scan_result" != *"error"* ]]; then
+        log_message "🚨 SECRET DETECTED in $file_path:"
+        log_message "$scan_result"
+        # Optionally, we could send an alert or take other action here
+    fi
     
     # Clean up temp file
     rm -f "$temp_scan_file"
